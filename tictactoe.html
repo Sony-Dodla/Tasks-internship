@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tic Tac Toe - ProDigy Infotech</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 10px;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      cursor: pointer;
+      border: 2px solid #ccc;
+      transition: background 0.2s;
+    }
+    .cell:hover {
+      background: #f1f1f1;
+    }
+    .status {
+      margin: 20px;
+      font-size: 1.2em;
+    }
+    .reset-btn {
+      padding: 10px 20px;
+      font-size: 1em;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .reset-btn:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tic Tac Toe</h1>
+  <div class="board" id="board"></div>
+  <div class="status" id="status">Player X's turn</div>
+  <button class="reset-btn" onclick="resetGame()">Reset Game</button>
+
+  <script>
+    const board = document.getElementById('board');
+    const statusText = document.getElementById('status');
+    let cells = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let isGameOver = false;
+
+    const winningCombinations = [
+      [0,1,2], [3,4,5], [6,7,8], // rows
+      [0,3,6], [1,4,7], [2,5,8], // columns
+      [0,4,8], [2,4,6]           // diagonals
+    ];
+
+    function renderBoard() {
+      board.innerHTML = '';
+      cells.forEach((value, index) => {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.textContent = value;
+        cell.addEventListener('click', () => handleCellClick(index));
+        board.appendChild(cell);
+      });
+    }
+
+    function handleCellClick(index) {
+      if (cells[index] !== '' || isGameOver) return;
+
+      cells[index] = currentPlayer;
+      renderBoard();
+      checkGameStatus();
+    }
+
+    function checkGameStatus() {
+      for (let combo of winningCombinations) {
+        const [a, b, c] = combo;
+        if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
+          statusText.textContent = `Player ${cells[a]} wins!`;
+          isGameOver = true;
+          return;
+        }
+      }
+
+      if (!cells.includes('')) {
+        statusText.textContent = "It's a draw!";
+        isGameOver = true;
+        return;
+      }
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      statusText.textContent = `Player ${currentPlayer}'s turn`;
+    }
+
+    function resetGame() {
+      cells = ['', '', '', '', '', '', '', '', ''];
+      currentPlayer = 'X';
+      isGameOver = false;
+      statusText.textContent = "Player X's turn";
+      renderBoard();
+    }
+
+    renderBoard();
+  </script>
+</body>
+</html>
