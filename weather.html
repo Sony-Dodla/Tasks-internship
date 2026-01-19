@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      color: #333;
+      text-align: center;
+      padding: 50px;
+    }
+
+    .weather-box {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: auto;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+      width: 60%;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌦 Weather App</h1>
+  <div>
+    <input type="text" id="cityInput" placeholder="Enter city name" />
+    <button onclick="getWeatherByCity()">Search</button>
+  </div>
+
+  <br/>
+
+  <div class="weather-box" id="weatherBox">
+    <h2>Weather Info</h2>
+    <p id="location">Detecting location...</p>
+    <p id="description"></p>
+    <p id="temperature"></p>
+    <p id="humidity"></p>
+    <p id="wind"></p>
+  </div>
+
+  <script>
+    const apiKey = "5bc8c3ca507f8fa108df27182a71c4d9"; // Replace with your OpenWeatherMap API key
+
+    function displayWeather(data) {
+      document.getElementById('location').textContent = `${data.name}, ${data.sys.country}`;
+      document.getElementById('description').textContent = `Condition: ${data.weather[0].description}`;
+      document.getElementById('temperature').textContent = `Temperature: ${(data.main.temp - 273.15).toFixed(1)}°C`;
+      document.getElementById('humidity').textContent = `Humidity: ${data.main.humidity}%`;
+      document.getElementById('wind').textContent = `Wind: ${data.wind.speed} m/s`;
+    }
+
+    function getWeatherByCoords(lat, lon) {
+      fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`)
+        .then(response => response.json())
+        .then(data => displayWeather(data))
+        .catch(err => console.error("Error fetching weather:", err));
+    }
+
+    function getWeatherByCity() {
+      const city = document.getElementById("cityInput").value;
+      if (!city) return alert("Please enter a city name");
+
+      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`)
+        .then(response => response.json())
+        .then(data => displayWeather(data))
+        .catch(err => alert("City not found"));
+    }
+
+    // Get weather by current location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const { latitude, longitude } = position.coords;
+          getWeatherByCoords(latitude, longitude);
+        },
+        () => {
+          document.getElementById('location').textContent = "Location permission denied.";
+        }
+      );
+    } else {
+      document.getElementById('location').textContent = "Geolocation not supported.";
+    }
+  </script>
+
+</body>
+</html>
